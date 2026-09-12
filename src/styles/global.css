@@ -1,0 +1,866 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Oswald:wght@400;500;600&display=swap");
+
+/* Fonte gótica/blackletter herdada do projeto irmão -- usada só no
+   wordmark (o resto dos "números grandes" continua em Cinzel). Troque pela
+   fonte de marca da Shadow of the Fallen quando o cliente enviar uma. */
+@font-face {
+  font-family: "Horst Blackletter";
+  src:
+    url("/fonts/Horst-Blackletter.woff2") format("woff2"),
+    url("/fonts/Horst-Blackletter.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-frame: #000000;
+  --bg-card: #000000;
+  --border-subtle: #1a1a1a;
+  --border-frame: #2a2a2a;
+  --accent: #ffffff;
+  --text-on-accent: #000000;
+  --text-primary: #f2f2f2;
+  --text-secondary: #e5e5e5;
+  --text-label: #888888;
+  --milestone-dim: #3a3a3a;
+  --logo-shine: rgba(255, 255, 255, 0.85);
+
+  color-scheme: dark;
+}
+
+/* Modo claro — mesma identidade (preto e branco puro, sem cor de destaque),
+   invertendo só fundo/texto. Ativado via data-theme="light" no <html> (ver
+   ThemeContext). */
+:root[data-theme="light"] {
+  --bg-frame: #e6e6e2;
+  --bg-card: #f0f0ec;
+  --border-subtle: #d5d5d0;
+  --border-frame: #b8b8b2;
+  --accent: #0a0a0a;
+  --text-on-accent: #f2f2f2;
+  --text-primary: #0a0a0a;
+  --text-secondary: #1f1f1f;
+  --text-label: #6b6b68;
+  --milestone-dim: #c9c9c4;
+  --logo-shine: rgba(0, 0, 0, 0.55);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-frame);
+  color: var(--text-secondary);
+  font-family: "Oswald", sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.mm-app-frame {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Header */
+/* ---------------------------------------------------------------------- */
+
+.mm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid var(--border-frame);
+  border-radius: 16px;
+  background: var(--bg-card);
+  padding: 20px 28px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.mm-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mm-logo-mark-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+}
+
+.mm-logo-mark {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+/* A logo é branca com fundo transparente — some no modo claro se não
+   inverter a cor. */
+:root[data-theme="light"] .mm-logo-mark {
+  filter: invert(1);
+}
+
+/* Efeito de "conquista": brilho pulsando + reflexo passando por cima do
+   símbolo, quando o membro bate o marco máximo do ciclo atual (15 vendas,
+   ver MemberDashboard/maxReached). O reflexo usa a própria logo como
+   máscara (mask-image) pra ficar recortado certinho no símbolo, sem vazar
+   um retângulo por cima da área transparente do PNG. */
+.mm-logo-celebrate .mm-logo-mark {
+  animation: mm-logo-glow 2.4s ease-in-out infinite;
+}
+
+.mm-logo-celebrate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(100deg, transparent 35%, var(--logo-shine) 50%, transparent 65%);
+  background-size: 320% 100%;
+  background-position: 130% 0;
+  -webkit-mask-image: url("/logo-m.png");
+  mask-image: url("/logo-m.png");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  animation: mm-logo-shine 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes mm-logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 7px var(--accent)); }
+}
+
+@keyframes mm-logo-shine {
+  0% { background-position: 130% 0; }
+  55% { background-position: -30% 0; }
+  100% { background-position: -30% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-logo-celebrate .mm-logo-mark {
+    animation: none;
+    filter: drop-shadow(0 0 6px var(--accent));
+  }
+  .mm-logo-celebrate::after {
+    display: none;
+  }
+}
+
+.mm-wordmark {
+  font-family: "Horst Blackletter", "Cinzel", serif;
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.mm-header-member {
+  text-align: right;
+}
+
+.mm-header-member .mm-member-name {
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.mm-header-member .mm-member-coupon {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+
+.mm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mm-header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 18px;
+  border-left: 1px solid var(--border-frame);
+}
+
+.mm-link-btn {
+  background: none;
+  border: 1px solid var(--border-frame);
+  color: var(--text-label);
+  padding: 8px 14px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.mm-link-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Labels / util */
+/* ---------------------------------------------------------------------- */
+
+.mm-label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-label);
+}
+
+.mm-section-title {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.mm-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mm-section-header .mm-section-title {
+  margin: 0;
+}
+
+.mm-search-input {
+  background: var(--bg-frame);
+  border: 1px solid var(--border-frame);
+  color: var(--text-primary);
+  font-family: "Oswald", sans-serif;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 240px;
+  max-width: 100%;
+}
+
+.mm-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.mm-month-select {
+  background: var(--bg-frame);
+  border: 1px solid var(--border-frame);
+  color: var(--text-primary);
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mm-month-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Stat cards */
+/* ---------------------------------------------------------------------- */
+
+.mm-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 720px) {
+  .mm-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mm-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 22px 24px;
+}
+
+.mm-stat-value {
+  font-family: "Cinzel", serif;
+  font-weight: 900;
+  font-size: 36px;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-top: 8px;
+}
+
+.mm-stat-value.mm-accent {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Progress section — barra serrilhada (elemento de assinatura) */
+/* ---------------------------------------------------------------------- */
+
+.mm-progress-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 28px 28px 22px;
+  margin-bottom: 32px;
+}
+
+.mm-congrats-banner {
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.mm-progress-track {
+  position: relative;
+  height: 22px;
+  background: var(--border-subtle);
+  margin: 18px 4px 12px;
+  clip-path: polygon(
+    0% 30%, 4% 0%, 8% 30%, 12% 0%, 16% 30%, 20% 0%, 24% 30%, 28% 0%,
+    32% 30%, 36% 0%, 40% 30%, 44% 0%, 48% 30%, 52% 0%, 56% 30%, 60% 0%,
+    64% 30%, 68% 0%, 72% 30%, 76% 0%, 80% 30%, 84% 0%, 88% 30%, 92% 0%,
+    96% 30%, 100% 0%,
+    100% 100%, 0% 100%
+  );
+}
+
+/* O topo do preenchimento é recortado no mesmo desenho de picos da borda da
+   barra (via mask, não clip-path fixo) e a máscara desliza — o vermelho
+   "ondula" de verdade, sem gradiente/sombra, só a própria cor sólida sendo
+   revelada/escondida em movimento. */
+.mm-progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: var(--accent);
+  transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='22' viewBox='0 0 48 22'%3E%3Cpath d='M0 3.5 Q12 0 24 3.5 Q36 7 48 3.5 L48 22 L0 22 Z' fill='white'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='22' viewBox='0 0 48 22'%3E%3Cpath d='M0 3.5 Q12 0 24 3.5 Q36 7 48 3.5 L48 22 L0 22 Z' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 48px 22px;
+  mask-size: 48px 22px;
+  -webkit-mask-position: right 0 top;
+  mask-position: right 0 top;
+  animation: mm-wave-flow 2s linear infinite;
+}
+
+@keyframes mm-wave-flow {
+  from {
+    -webkit-mask-position: right 0px top;
+    mask-position: right 0px top;
+  }
+  to {
+    -webkit-mask-position: right 48px top;
+    mask-position: right 48px top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-progress-fill {
+    animation: none;
+  }
+}
+
+.mm-progress-milestones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 14px;
+}
+
+.mm-milestone {
+  text-align: center;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.mm-milestone:first-child {
+  border-left: none;
+}
+
+.mm-milestone-number {
+  font-family: "Cinzel", serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.mm-milestone-number.mm-milestone-dim {
+  color: var(--milestone-dim);
+}
+
+.mm-milestone-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-top: 4px;
+}
+
+.mm-rewards-explainer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mm-rewards-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mm-rewards-list li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mm-rewards-list li strong {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Table */
+/* ---------------------------------------------------------------------- */
+
+.mm-table-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 24px 24px 8px;
+}
+
+.mm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mm-table-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.mm-table-scroll .mm-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+
+.mm-table th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  font-weight: 500;
+  padding: 0 12px 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mm-table td {
+  padding: 12px 12px 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.mm-sort-th-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mm-sort-th-btn:hover {
+  color: var(--accent);
+}
+
+.mm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mm-table td.mm-cell-amount {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mm-empty-state {
+  padding: 24px 0;
+  color: var(--text-label);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+.mm-reset-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--accent);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.mm-reset-banner strong {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.mm-reset-banner-error {
+  border-color: var(--border-frame);
+  color: var(--text-label);
+}
+
+.mm-reset-banner-error strong {
+  color: var(--text-label);
+}
+
+.mm-reset-banner .mm-link-btn {
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Admin table */
+/* ---------------------------------------------------------------------- */
+
+.mm-admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .mm-admin-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tabela larga (muitas colunas) num espaço estreito (mobile, etc.) -- em
+   vez de espremer célula por célula, deixa a tabela com sua largura
+   natural e rola por dentro. */
+.mm-table-hscroll {
+  overflow-x: auto;
+}
+
+.mm-table-hscroll .mm-table {
+  min-width: 620px;
+}
+
+.mm-table td.mm-member-row-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mm-edit-icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-label);
+  padding: 2px;
+  margin-left: 8px;
+  cursor: pointer;
+  vertical-align: middle;
+  display: inline-flex;
+}
+
+.mm-edit-icon-btn:hover {
+  color: var(--accent);
+}
+
+.mm-inline-edit-input {
+  width: 100%;
+  background: var(--bg-frame);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: "Oswald", sans-serif;
+}
+
+.mm-table td.mm-member-row-coupon,
+.mm-member-row-coupon {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.mm-tier-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--border-frame);
+  color: var(--text-label);
+}
+
+.mm-tier-badge.mm-tier-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mm-delivery-status {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.mm-delivery-status.mm-delivery-status-done {
+  border-color: var(--border-frame);
+  color: var(--text-label);
+}
+
+.mm-delivery-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-delivery-step-btn {
+  background: none;
+  border: 1px solid var(--border-frame);
+  color: var(--text-secondary);
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: "Oswald", sans-serif;
+}
+
+.mm-delivery-step-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mm-delivery-step-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mm-delivery-count {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: center;
+}
+
+.mm-delivery-count.mm-delivery-count-done {
+  color: var(--text-label);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Auth / login */
+/* ---------------------------------------------------------------------- */
+
+.mm-auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.mm-auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-frame);
+  border-radius: 16px;
+  padding: 36px 32px;
+}
+
+.mm-auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.mm-config-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.mm-config-grid .mm-field {
+  margin-bottom: 0;
+  width: 180px;
+}
+
+.mm-config-grid .mm-field input,
+.mm-config-grid .mm-field select {
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.mm-config-save-btn {
+  height: 42px;
+  padding: 0 24px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 4px;
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mm-config-save-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.mm-config-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mm-field {
+  margin-bottom: 16px;
+}
+
+.mm-field label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mm-field input,
+.mm-field select {
+  width: 100%;
+  background: var(--bg-frame);
+  border: 1px solid var(--border-frame);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.mm-field input:focus,
+.mm-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.mm-btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mm-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mm-auth-error {
+  color: var(--accent);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.mm-loading-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
