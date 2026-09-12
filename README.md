@@ -43,9 +43,16 @@ Faltam os passos de infra — nenhum deles foi feito ainda:
       placeholder em `supabase/functions/send-gift-card/index.ts`
       (`EMAIL_ASSETS_BASE`, `STORE_URL`, e os links de redes sociais no
       rodapé do e-mail).
-- [ ] Trocar a logo em `public/logo-m.png` / `public/logo-m-original-black-bg.png`
-      (hoje é um placeholder 1x1 transparente) e as URLs do `index.html`
-      (`og:image`, `og:url`) pelas de verdade.
+- [x] ~~Trocar a logo~~ — feito. `public/logo-m.png` e `public/favicon.png`
+      são o wordmark branco com fundo transparente (256×256),
+      `public/favicon.svg` é o mesmo desenho trocando pra preto na aparência
+      clara (`prefers-color-scheme`), e `public/logo-m-original-black-bg.png`
+      é o card 1200×630 sobre preto. Origem: arte de 225×225, recortada por
+      luminância → alpha. Se aparecer um vetor da marca, vale regerar: hoje
+      o glifo ocupa só 144×207 px nativos, e por isso fica pequeno no card
+      de compartilhamento.
+- [ ] Trocar as URLs do `index.html` (`og:image`, `og:url`) pelas de verdade
+      — ainda apontam pra `SEU-DOMINIO-AQUI.vercel.app`.
 - [ ] Inserir o e-mail de admin (a migration deixou um `insert` comentado no
       final, só descomentar e ajustar, depois de criar a conta em
       Authentication → Users).
