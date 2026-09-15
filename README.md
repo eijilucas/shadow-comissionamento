@@ -27,8 +27,9 @@ Passos de infra — estado em 15/09/2026:
       Loja `zu1bmt-6k.myshopify.com`, escopos `read_discounts`,
       `write_discounts`, `read_products`. Client ID/Secret já configurados
       como secrets da function (ver abaixo).
-- [ ] Criar o SEGUNDO app, o de gift card, com escopo `write_gift_cards`
-      (ver seção "Gift card" abaixo) — ainda não feito.
+- [x] ~~Criar o SEGUNDO app, o de gift card~~ — feito, escopo
+      `write_gift_cards`. `SHOPIFY_GIFTCARD_CLIENT_ID`/`_SECRET`
+      configurados como secrets das functions.
 - [x] ~~Criar um projeto Supabase novo~~ — feito: `rveyiabuqhcfiezklhms`
       (`https://rveyiabuqhcfiezklhms.supabase.co`).
 - [x] ~~Rodar a migration~~ — feito, `20260912000001_init.sql` aplicada via
@@ -36,10 +37,12 @@ Passos de infra — estado em 15/09/2026:
       Usa o **pooler** (porta 6543, transação), não a conexão direta
       (`db.<ref>.supabase.co:5432`) — essa só resolve em IPv6, e falhou com
       `ECONNREFUSED` num ambiente sem rota IPv6.
-- [x] ~~Configurar os secrets do app principal~~ — feito:
-      `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`.
-      Ainda faltam `RESEND_API_KEY`, `ASAAS_API_KEY` e os dois
-      `SHOPIFY_GIFTCARD_CLIENT_*` (dependem do segundo app, acima).
+- [x] ~~Configurar os secrets do Shopify~~ — feito, os 5:
+      `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`,
+      `SHOPIFY_GIFTCARD_CLIENT_ID`, `SHOPIFY_GIFTCARD_CLIENT_SECRET`.
+      Ainda faltam `RESEND_API_KEY` e `ASAAS_API_KEY` — sem eles,
+      `send-gift-card` e `pay-commission-pix` estão deployadas mas falham em
+      runtime.
 - [x] ~~Deploy das Edge Functions~~ — feito, as 10 estão `ACTIVE`.
       `shopify-webhook` confirmado com `verify_jwt: false` (as outras 9 com
       `true`, correto). Testado com um POST sem HMAC: respondeu
