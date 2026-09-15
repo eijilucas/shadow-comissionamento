@@ -50,8 +50,13 @@ Passos de infra — estado em 15/09/2026:
       `401 Assinatura HMAC inválida` — confirma que a function está no ar
       *e* que `SHOPIFY_CLIENT_SECRET` está configurado (sem o secret, a
       function loga um warn e deixa passar, "modo dev").
-- [ ] Registrar os webhooks na Shopify (ver lista de eventos abaixo) — a
-      URL já está pronta: `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`.
+- [x] ~~Registrar os webhooks na Shopify~~ — feito, os 6, apontando pra
+      `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`.
+      Sem confirmação automática ainda (criar a assinatura não dispara
+      nada sozinho, só evento real ou "Send test notification" manual) —
+      pra verificar de verdade: fazer um pedido de teste com cupom de
+      afiliado na loja e olhar se a venda aparece em `sales`, ou checar o
+      Log Explorer do projeto no painel do Supabase.
 - [x] ~~Deploy do frontend~~ — feito, no ar em
       `https://shadow-comissao.vercel.app` (projeto Vercel
       `eiji-mental/shadow-comissao`, ligado ao repo do GitHub — todo push em
