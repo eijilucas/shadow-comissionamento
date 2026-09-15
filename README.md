@@ -21,26 +21,39 @@ O ecossistema da marca é Shopify + o app irmão **Mental Jackpot** (lucro
 líquido, já clonado em `../jackpot`) + este comissionamento — não tem
 mm-etiquetas nem Vendas Externas.
 
-Faltam os passos de infra — nenhum deles foi feito ainda:
+Passos de infra — estado em 15/09/2026:
 
-- [ ] Criar o app customizado na loja Shopify (`Configurações → Apps →
-      Desenvolver apps`), pegar Client ID/Secret. Escopos: `read_discounts`,
-      `write_discounts`, `read_products`. Pro gift card, um segundo app
-      separado com `write_gift_cards` (ver seção "Gift card" abaixo).
+- [x] ~~Criar o app customizado principal na loja Shopify~~ — feito.
+      Loja `zu1bmt-6k.myshopify.com`, escopos `read_discounts`,
+      `write_discounts`, `read_products`. Client ID/Secret já configurados
+      como secrets da function (ver abaixo).
+- [ ] Criar o SEGUNDO app, o de gift card, com escopo `write_gift_cards`
+      (ver seção "Gift card" abaixo) — ainda não feito.
 - [x] ~~Criar um projeto Supabase novo~~ — feito: `rveyiabuqhcfiezklhms`
       (`https://rveyiabuqhcfiezklhms.supabase.co`).
-- [ ] Rodar a migration `supabase/migrations/20260912000001_init.sql` nesse
-      projeto (`npx supabase db push --db-url "postgresql://postgres:<senha>@db.rveyiabuqhcfiezklhms.supabase.co:5432/postgres"`
-      — a senha do banco está no cofre de senhas, não neste repositório).
-- [ ] Configurar os secrets das functions (ver seção abaixo).
-- [ ] Deploy das Edge Functions — `shopify-webhook` precisa de
-      `verify_jwt = false` (já está em `supabase/config.toml`, mas cite ao
-      rodar `supabase functions deploy` se usar `--no-verify-jwt` fora do
-      config).
-- [ ] Registrar os webhooks na Shopify (ver lista de eventos abaixo).
-- [ ] Deploy do frontend (Vercel) em `shadow-comissao.vercel.app`, com as
-      env vars `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` apontando pro
-      Supabase novo (mesmos valores do `.env` local, que não é versionado).
+- [x] ~~Rodar a migration~~ — feito, `20260912000001_init.sql` aplicada via
+      `npx supabase db push --db-url "postgresql://postgres.rveyiabuqhcfiezklhms:<senha>@aws-0-sa-east-1.pooler.supabase.com:6543/postgres"`.
+      Usa o **pooler** (porta 6543, transação), não a conexão direta
+      (`db.<ref>.supabase.co:5432`) — essa só resolve em IPv6, e falhou com
+      `ECONNREFUSED` num ambiente sem rota IPv6.
+- [x] ~~Configurar os secrets do app principal~~ — feito:
+      `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`.
+      Ainda faltam `RESEND_API_KEY`, `ASAAS_API_KEY` e os dois
+      `SHOPIFY_GIFTCARD_CLIENT_*` (dependem do segundo app, acima).
+- [x] ~~Deploy das Edge Functions~~ — feito, as 10 estão `ACTIVE`.
+      `shopify-webhook` confirmado com `verify_jwt: false` (as outras 9 com
+      `true`, correto). Testado com um POST sem HMAC: respondeu
+      `401 Assinatura HMAC inválida` — confirma que a function está no ar
+      *e* que `SHOPIFY_CLIENT_SECRET` está configurado (sem o secret, a
+      function loga um warn e deixa passar, "modo dev").
+- [ ] Registrar os webhooks na Shopify (ver lista de eventos abaixo) — a
+      URL já está pronta: `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`.
+- [x] ~~Deploy do frontend~~ — feito, no ar em
+      `https://shadow-comissao.vercel.app` (projeto Vercel
+      `eiji-mental/shadow-comissao`, ligado ao repo do GitHub — todo push em
+      `master` faz redeploy automático). Env vars `VITE_SUPABASE_URL` /
+      `VITE_SUPABASE_ANON_KEY` configuradas em Production, mesmos valores do
+      `.env` local (não versionado).
 - [ ] Subir os assets de e-mail (logo, banner, ícones) num bucket
       `email-assets` do Supabase Storage do projeto novo, e trocar as URLs
       placeholder em `supabase/functions/send-gift-card/index.ts`
@@ -56,9 +69,11 @@ Faltam os passos de infra — nenhum deles foi feito ainda:
       de compartilhamento.
 - [x] ~~Trocar as URLs do `index.html`~~ — feito, apontam pra
       `shadow-comissao.vercel.app`.
-- [ ] Inserir o e-mail de admin (a migration deixou um `insert` comentado no
-      final, só descomentar e ajustar, depois de criar a conta em
-      Authentication → Users).
+- [x] ~~Inserir o e-mail de admin~~ — feito. `lucas@hinfros.com.br`,
+      cupom `ADMIN`, `is_admin: true`, linkado ao usuário de Auth
+      correspondente. Login funciona por e-mail (ver `resolveLoginEmail`
+      em `src/lib/auth.ts` — login com `@` é tratado como e-mail real, não
+      cupom).
 
 > **Antes de rodar qualquer `supabase` aqui:** sempre passe
 > `--project-ref <ref do projeto NOVO>` explícito em qualquer comando
@@ -180,23 +195,25 @@ Regras atuais:
 
 ## Deploy das functions
 
+Sem argumento, `functions deploy` publica todas de uma vez só (lê
+`verify_jwt` de cada uma em `supabase/config.toml`, não precisa listar):
+
 ```
-npx supabase functions deploy shopify-webhook --project-ref <ref>
-npx supabase functions deploy shopify-sync-coupon --project-ref <ref>
-npx supabase functions deploy send-gift-card --project-ref <ref>
-npx supabase functions deploy delete-member --project-ref <ref>
-npx supabase functions deploy add-manual-sale --project-ref <ref>
-npx supabase functions deploy delete-sale --project-ref <ref>
-npx supabase functions deploy pay-commission-pix --project-ref <ref>
-npx supabase functions deploy reset-member-password --project-ref <ref>
-npx supabase functions deploy create-member-login --project-ref <ref>
-npx supabase functions deploy bulk-create-logins --project-ref <ref>
+npx supabase functions deploy --project-ref rveyiabuqhcfiezklhms
 ```
+
+Precisa de `SUPABASE_ACCESS_TOKEN` no ambiente (Personal Access Token, gerado
+em `supabase.com/dashboard/account/tokens`) — `--project-ref` sozinho não
+autentica, e a senha do banco (usada no `db push`) não serve aqui, é uma API
+diferente (Management API da conta, não o Postgres).
 
 `shopify-webhook` precisa de `verify_jwt = false` — já está declarado em
 `supabase/config.toml` (`[functions.shopify-webhook]`), porque a
 autenticação dela é a assinatura HMAC do corpo, não um JWT do Supabase; sem
-isso o gateway devolve 401 antes da function rodar.
+isso o gateway devolve 401 antes da function rodar. Confirmado com
+`supabase functions list` (`"verify_jwt":false` só nela) e com um POST sem
+assinatura, que devolveu `401 Assinatura HMAC inválida` — HTTP 401 na
+resposta da própria function, e não um 401 genérico do gateway.
 
 ## Segurança
 
