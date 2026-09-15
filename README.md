@@ -63,11 +63,23 @@ Passos de infra — estado em 15/09/2026:
       `master` faz redeploy automático). Env vars `VITE_SUPABASE_URL` /
       `VITE_SUPABASE_ANON_KEY` configuradas em Production, mesmos valores do
       `.env` local (não versionado).
-- [ ] Subir os assets de e-mail (logo, banner, ícones) num bucket
-      `email-assets` do Supabase Storage do projeto novo, e trocar as URLs
-      placeholder em `supabase/functions/send-gift-card/index.ts`
-      (`EMAIL_ASSETS_BASE`, `STORE_URL`, e os links de redes sociais no
-      rodapé do e-mail).
+- [x] ~~Trocar `STORE_URL` e os links de redes sociais~~ — feito.
+      `STORE_URL` aponta pra `zu1bmt-6k.myshopify.com`, rodapé do e-mail
+      leva pro Instagram e WhatsApp reais; o bloco do Discord foi removido
+      (a marca não tem servidor). `EMAIL_ASSETS_BASE` mudou de estratégia:
+      em vez de um bucket `email-assets` no Storage, agora aponta pro
+      próprio site (`public/` servido pela Vercel) — mais simples, sem
+      upload manual toda vez que um asset muda.
+      3 assets prontos: `shadow-wordmark.png` (a logo da tela de login,
+      rotacionada — "deitada"), `icon-whatsapp.png`, `icon-instagram.png`.
+      `shadow-mark.png`, `shadow-banner.jpg`, `shadow-tribal-tl.png`,
+      `shadow-tribal-br.png` e `icon-discord.png` não existem e foram
+      **removidos do template** (em vez de apontar pra imagem quebrada) —
+      os `<tr>`/`<td>` que os usavam estão comentados no código, prontos
+      pra voltar quando a arte aparecer em `public/`. Só
+      `shadow-bg-black.png` (textura de fundo) segue referenciado mesmo
+      sem existir — degrada bem, o e-mail já tem `bgcolor="#000000"` fixo
+      por baixo.
 - [x] ~~Trocar a logo~~ — feito. `public/logo-m.png` e `public/favicon.png`
       são o wordmark branco com fundo transparente (256×256),
       `public/favicon.svg` é o mesmo desenho trocando pra preto na aparência

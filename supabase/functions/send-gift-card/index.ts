@@ -33,12 +33,18 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const currencyFormatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
 // Vitrine da loja (não o admin/.myshopify.com) -- usado só no botão de
-// call-to-action do e-mail. Placeholder -- troque pela URL de verdade.
-const STORE_URL = "https://SEU-DOMINIO-AQUI.com/";
+// call-to-action do e-mail. myshopify.com serve a loja por padrão (sem
+// domínio próprio configurado ainda) -- troque se um domínio customizado
+// entrar no lugar.
+const STORE_URL = "https://zu1bmt-6k.myshopify.com/";
 
-// Placeholder -- suba os assets num bucket "email-assets" do Storage do
-// projeto Supabase novo e troque este prefixo pela URL real.
-const EMAIL_ASSETS_BASE = "https://SEU-PROJETO.supabase.co/storage/v1/object/public/email-assets";
+// Os assets ficam em `public/` deste repo, servidos pelo próprio site na
+// Vercel -- mais simples que manter um bucket separado no Storage (que
+// precisaria de upload manual toda vez que um asset mudasse). Nem todos os
+// assets abaixo existem ainda (ver comentários em cada <img>); os que
+// faltam degradam bem (o e-mail já usa bgcolor="#000000" fixo, então a
+// falta do shadow-bg-black.png não quebra layout, só perde a textura).
+const EMAIL_ASSETS_BASE = "https://shadow-comissao.vercel.app";
 
 // Mesmo template visual do e-mail de recompensa da Mental Madness (mesmos
 // assets, cores, estrutura de tabelas pra compatibilidade com Outlook/Gmail)
@@ -105,16 +111,17 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
 
           <tr>
             <td align="center" class="mm-px" style="padding: 40px 0 20px;">
-              <img src="${EMAIL_ASSETS_BASE}/shadow-mark.png" width="60" height="60" alt="" style="display:block; width:60px; height:60px; border:0; outline:none; margin: 0 auto 18px;">
-              <img src="${EMAIL_ASSETS_BASE}/shadow-wordmark.png" width="280" height="58" alt="Shadow of the Fallen" style="display:block; width:280px; height:58px; border:0; outline:none; margin: 0 auto;">
+              <!-- A arte da Shadow of the Fallen é o wordmark inteiro (não
+                   tem um ícone separado, ao contrário do Mental Madness) --
+                   por isso só uma imagem aqui, a mesma logo da tela de
+                   login, rotacionada pra ficar deitada. -->
+              <img src="${EMAIL_ASSETS_BASE}/shadow-wordmark.png" width="231" height="168" alt="Shadow of the Fallen" style="display:block; width:231px; height:168px; border:0; outline:none; margin: 0 auto;">
             </td>
           </tr>
 
-          <tr>
-            <td style="padding: 8px 0 0;">
-              <img src="${EMAIL_ASSETS_BASE}/shadow-banner.jpg" width="600" height="202" alt="" style="display:block; width:100%; max-width:600px; height:auto; border:0; outline:none;">
-            </td>
-          </tr>
+          <!-- shadow-banner.jpg ainda não existe -- sem banner de verdade,
+               o <tr> com essa imagem fica melhor removido do que apontando
+               pra algo quebrado. Reintroduz quando tiver o banner. -->
 
           <tr>
             <td style="border-top: 1px solid #1c1c1a; font-size:1px; line-height:1px;">&nbsp;</td>
@@ -138,18 +145,17 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
 
           <tr>
             <td align="center" class="mm-px" style="padding: 0 40px 32px;">
+              <!-- Sem shadow-tribal-tl.png/-br.png (flourishes decorativos
+                   nos cantos, do template original) -- em vez de deixar
+                   ícone quebrado colado no código do gift card, a caixa
+                   fica só com a borda, sem os cantos. Reintroduz as duas
+                   <td> laterais (52x53 cada) se um dia tiver a arte. -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #2a2a28;">
                 <tr>
-                  <td width="62" valign="middle" align="left" style="padding: 0 0 0 10px; line-height:0;">
-                    <img src="${EMAIL_ASSETS_BASE}/shadow-tribal-tl.png" width="52" height="53" alt="" style="display:block; width:52px; height:53px; border:0; outline:none;">
-                  </td>
-                  <td align="center" valign="middle" style="padding: 26px 4px;">
+                  <td align="center" valign="middle" style="padding: 26px 16px;">
                     <span style="font-family: 'Oswald', Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 3px; color: #7a7a74; text-transform: uppercase;">Código do gift card</span>
                     <br>
                     <span class="mm-code" style="font-family: 'Oswald', Arial, Helvetica, sans-serif; font-size: 26px; line-height: 40px; font-weight: 600; letter-spacing: 4px; color: #ffffff;">${params.code}</span>
-                  </td>
-                  <td width="62" valign="middle" align="right" style="padding: 0 10px 0 0; line-height:0;">
-                    <img src="${EMAIL_ASSETS_BASE}/shadow-tribal-br.png" width="52" height="53" alt="" style="display:block; width:52px; height:53px; border:0; outline:none;">
                   </td>
                 </tr>
               </table>
@@ -200,20 +206,15 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
           <tr>
             <td align="center" style="padding: 0 16px 48px; font-size:0;">
 
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="display:inline-block; border: 1px solid #2a2a28; margin: 4px;">
-                <tr>
-                  <td style="padding: 10px 16px;">
-                    <a href="https://discord.gg/SEU-SERVIDOR-AQUI" target="_blank" style="display:inline-block; font-family:'Oswald', Arial, Helvetica, sans-serif; font-size:11px; font-weight:500; letter-spacing:1px; color:#f4f4f2; text-decoration:none; white-space:nowrap;">
-                      <img src="${EMAIL_ASSETS_BASE}/icon-discord.png" width="13" height="13" alt="" style="display:inline-block; width:13px; height:13px; vertical-align:middle; margin-right:7px; border:0;">Discord
-                    </a>
-                  </td>
-                </tr>
-              </table>
+              <!-- Discord removido -- a Shadow of the Fallen não tem
+                   servidor (diferente do Mental Madness). Reintroduz se um
+                   dia tiver: precisa do link do convite e de
+                   icon-discord.png em public/. -->
 
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="display:inline-block; border: 1px solid #2a2a28; margin: 4px;">
                 <tr>
                   <td style="padding: 10px 16px;">
-                    <a href="https://wa.me/SEUNUMEROAQUI" target="_blank" style="display:inline-block; font-family:'Oswald', Arial, Helvetica, sans-serif; font-size:11px; font-weight:500; letter-spacing:1px; color:#f4f4f2; text-decoration:none; white-space:nowrap;">
+                    <a href="https://chat.whatsapp.com/FItNzzWqbraKEcvT5yim2I?s=sh&p=i&mlu=4&ilr=4" target="_blank" style="display:inline-block; font-family:'Oswald', Arial, Helvetica, sans-serif; font-size:11px; font-weight:500; letter-spacing:1px; color:#f4f4f2; text-decoration:none; white-space:nowrap;">
                       <img src="${EMAIL_ASSETS_BASE}/icon-whatsapp.png" width="13" height="13" alt="" style="display:inline-block; width:13px; height:13px; vertical-align:middle; margin-right:7px; border:0;">WhatsApp
                     </a>
                   </td>
@@ -223,7 +224,7 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="display:inline-block; border: 1px solid #2a2a28; margin: 4px;">
                 <tr>
                   <td style="padding: 10px 16px;">
-                    <a href="https://instagram.com/SEU-PERFIL-AQUI" target="_blank" style="display:inline-block; font-family:'Oswald', Arial, Helvetica, sans-serif; font-size:11px; font-weight:500; letter-spacing:1px; color:#f4f4f2; text-decoration:none; white-space:nowrap;">
+                    <a href="https://www.instagram.com/shadowofthefallenn/" target="_blank" style="display:inline-block; font-family:'Oswald', Arial, Helvetica, sans-serif; font-size:11px; font-weight:500; letter-spacing:1px; color:#f4f4f2; text-decoration:none; white-space:nowrap;">
                       <img src="${EMAIL_ASSETS_BASE}/icon-instagram.png" width="13" height="13" alt="" style="display:inline-block; width:13px; height:13px; vertical-align:middle; margin-right:7px; border:0;">Instagram
                     </a>
                   </td>
