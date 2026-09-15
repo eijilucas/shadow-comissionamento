@@ -70,13 +70,19 @@ Passos de infra — estado em 15/09/2026:
       em vez de um bucket `email-assets` no Storage, agora aponta pro
       próprio site (`public/` servido pela Vercel) — mais simples, sem
       upload manual toda vez que um asset muda.
-      3 assets prontos: `shadow-wordmark.png` (a logo da tela de login,
-      rotacionada — "deitada"), `icon-whatsapp.png`, `icon-instagram.png`.
-      `shadow-mark.png`, `shadow-banner.jpg`, `shadow-tribal-tl.png`,
-      `shadow-tribal-br.png` e `icon-discord.png` não existem e foram
-      **removidos do template** (em vez de apontar pra imagem quebrada) —
-      os `<tr>`/`<td>` que os usavam estão comentados no código, prontos
-      pra voltar quando a arte aparecer em `public/`. Só
+      4 assets prontos, layout igual ao do Mental Madness (marca pequena +
+      wordmark em texto, dois `<img>` empilhados):
+      `shadow-mark.png` (recorte de `logo-m.png`, a mesma marca do site
+      inteiro), `shadow-wordmark.png` ("Shadow of the Fallen" na fonte
+      Horst Blackletter — a mesma da tela de login — renderizada como PNG
+      via headless Chrome + a mesma conversão luminância→alpha da logo,
+      porque e-mail não carrega `@font-face` de forma confiável entre
+      clientes), `icon-whatsapp.png`, `icon-instagram.png`.
+      `shadow-banner.jpg`, `shadow-tribal-tl.png`, `shadow-tribal-br.png` e
+      `icon-discord.png` não existem e foram **removidos do template** (em
+      vez de apontar pra imagem quebrada) — os `<tr>`/`<td>` que os usavam
+      estão comentados no código, prontos pra voltar quando a arte
+      aparecer em `public/`. Só
       `shadow-bg-black.png` (textura de fundo) segue referenciado mesmo
       sem existir — degrada bem, o e-mail já tem `bgcolor="#000000"` fixo
       por baixo.

@@ -111,11 +111,13 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
 
           <tr>
             <td align="center" class="mm-px" style="padding: 40px 0 20px;">
-              <!-- A arte da Shadow of the Fallen é o wordmark inteiro (não
-                   tem um ícone separado, ao contrário do Mental Madness) --
-                   por isso só uma imagem aqui, a mesma logo da tela de
-                   login, rotacionada pra ficar deitada. -->
-              <img src="${EMAIL_ASSETS_BASE}/shadow-wordmark.png" width="231" height="168" alt="Shadow of the Fallen" style="display:block; width:231px; height:168px; border:0; outline:none; margin: 0 auto;">
+              <!-- Mesmo layout de duas peças do Mental Madness: marca
+                   pequena em cima (logo-m.png, a mesma do site inteiro),
+                   wordmark em texto embaixo (fonte Horst Blackletter --
+                   igual à tela de login -- renderizada como PNG porque
+                   e-mail não confia em @font-face de cliente pra cliente). -->
+              <img src="${EMAIL_ASSETS_BASE}/shadow-mark.png" width="60" height="60" alt="" style="display:block; width:60px; height:60px; border:0; outline:none; margin: 0 auto 18px;">
+              <img src="${EMAIL_ASSETS_BASE}/shadow-wordmark.png" width="300" height="38" alt="Shadow of the Fallen" style="display:block; width:300px; height:38px; border:0; outline:none; margin: 0 auto;">
             </td>
           </tr>
 
