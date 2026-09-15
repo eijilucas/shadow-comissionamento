@@ -27,17 +27,20 @@ Faltam os passos de infra — nenhum deles foi feito ainda:
       Desenvolver apps`), pegar Client ID/Secret. Escopos: `read_discounts`,
       `write_discounts`, `read_products`. Pro gift card, um segundo app
       separado com `write_gift_cards` (ver seção "Gift card" abaixo).
-- [ ] Criar um projeto Supabase novo (separado do Mental Madness e do
-      Mental Jackpot).
+- [x] ~~Criar um projeto Supabase novo~~ — feito: `rveyiabuqhcfiezklhms`
+      (`https://rveyiabuqhcfiezklhms.supabase.co`).
 - [ ] Rodar a migration `supabase/migrations/20260912000001_init.sql` nesse
-      projeto novo (`npx supabase db push --project-ref <ref>`).
+      projeto (`npx supabase db push --db-url "postgresql://postgres:<senha>@db.rveyiabuqhcfiezklhms.supabase.co:5432/postgres"`
+      — a senha do banco está no cofre de senhas, não neste repositório).
 - [ ] Configurar os secrets das functions (ver seção abaixo).
 - [ ] Deploy das Edge Functions — `shopify-webhook` precisa de
       `verify_jwt = false` (já está em `supabase/config.toml`, mas cite ao
       rodar `supabase functions deploy` se usar `--no-verify-jwt` fora do
       config).
 - [ ] Registrar os webhooks na Shopify (ver lista de eventos abaixo).
-- [ ] Deploy do frontend (Vercel), com `.env` apontando pro Supabase novo.
+- [ ] Deploy do frontend (Vercel) em `shadow-comissao.vercel.app`, com as
+      env vars `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` apontando pro
+      Supabase novo (mesmos valores do `.env` local, que não é versionado).
 - [ ] Subir os assets de e-mail (logo, banner, ícones) num bucket
       `email-assets` do Supabase Storage do projeto novo, e trocar as URLs
       placeholder em `supabase/functions/send-gift-card/index.ts`
@@ -51,8 +54,8 @@ Faltam os passos de infra — nenhum deles foi feito ainda:
       luminância → alpha. Se aparecer um vetor da marca, vale regerar: hoje
       o glifo ocupa só 144×207 px nativos, e por isso fica pequeno no card
       de compartilhamento.
-- [ ] Trocar as URLs do `index.html` (`og:image`, `og:url`) pelas de verdade
-      — ainda apontam pra `SEU-DOMINIO-AQUI.vercel.app`.
+- [x] ~~Trocar as URLs do `index.html`~~ — feito, apontam pra
+      `shadow-comissao.vercel.app`.
 - [ ] Inserir o e-mail de admin (a migration deixou um `insert` comentado no
       final, só descomentar e ajustar, depois de criar a conta em
       Authentication → Users).
