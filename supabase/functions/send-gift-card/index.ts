@@ -121,9 +121,16 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
             </td>
           </tr>
 
-          <!-- shadow-banner.jpg ainda não existe -- sem banner de verdade,
-               o <tr> com essa imagem fica melhor removido do que apontando
-               pra algo quebrado. Reintroduz quando tiver o banner. -->
+          <tr>
+            <td align="center" style="padding: 8px 0 0;">
+              <!-- Recorte do rosto do Kaneki (foto de produto da camiseta
+                   em public/kaneki.jpg) -- proporção retrato (460x529),
+                   diferente do 600x202 bem largo do template original do
+                   Mental Madness, porque um recorte só-do-rosto não cabe
+                   numa faixa curta sem cortar o queixo ou a testa. -->
+              <img src="${EMAIL_ASSETS_BASE}/shadow-banner.jpg" width="460" height="529" alt="" style="display:block; width:100%; max-width:460px; height:auto; border:0; outline:none; margin: 0 auto;">
+            </td>
+          </tr>
 
           <tr>
             <td style="border-top: 1px solid #1c1c1a; font-size:1px; line-height:1px;">&nbsp;</td>

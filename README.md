@@ -70,22 +70,26 @@ Passos de infra — estado em 15/09/2026:
       em vez de um bucket `email-assets` no Storage, agora aponta pro
       próprio site (`public/` servido pela Vercel) — mais simples, sem
       upload manual toda vez que um asset muda.
-      4 assets prontos, layout igual ao do Mental Madness (marca pequena +
-      wordmark em texto, dois `<img>` empilhados):
+      5 assets prontos, layout igual ao do Mental Madness (marca pequena +
+      wordmark em texto, banner, dois `<img>` empilhados no cabeçalho):
       `shadow-mark.png` (recorte de `logo-m.png`, a mesma marca do site
       inteiro), `shadow-wordmark.png` ("Shadow of the Fallen" na fonte
       Horst Blackletter — a mesma da tela de login — renderizada como PNG
       via headless Chrome + a mesma conversão luminância→alpha da logo,
       porque e-mail não carrega `@font-face` de forma confiável entre
-      clientes), `icon-whatsapp.png`, `icon-instagram.png`.
-      `shadow-banner.jpg`, `shadow-tribal-tl.png`, `shadow-tribal-br.png` e
-      `icon-discord.png` não existem e foram **removidos do template** (em
-      vez de apontar pra imagem quebrada) — os `<tr>`/`<td>` que os usavam
-      estão comentados no código, prontos pra voltar quando a arte
-      aparecer em `public/`. Só
-      `shadow-bg-black.png` (textura de fundo) segue referenciado mesmo
-      sem existir — degrada bem, o e-mail já tem `bgcolor="#000000"` fixo
-      por baixo.
+      clientes), `icon-whatsapp.png`, `icon-instagram.png`, e
+      `shadow-banner.jpg` (recorte só do rosto do "Kaneki" da estampa de
+      `public/kaneki.jpg`, foto de produto de uma camiseta — proporção
+      retrato 460×529, diferente do 600×202 bem largo do template
+      original, porque um recorte só-do-rosto não cabe numa faixa curta
+      sem cortar queixo/testa).
+      `shadow-tribal-tl.png`, `shadow-tribal-br.png` e `icon-discord.png`
+      não existem e foram **removidos do template** (em vez de apontar
+      pra imagem quebrada) — os `<tr>`/`<td>` que os usavam estão
+      comentados no código, prontos pra voltar quando a arte aparecer em
+      `public/`. Só `shadow-bg-black.png` (textura de fundo) segue
+      referenciado mesmo sem existir — degrada bem, o e-mail já tem
+      `bgcolor="#000000"` fixo por baixo.
 - [x] ~~Trocar a logo~~ — feito. `public/logo-m.png` e `public/favicon.png`
       são o wordmark branco com fundo transparente (256×256),
       `public/favicon.svg` é o mesmo desenho trocando pra preto na aparência
