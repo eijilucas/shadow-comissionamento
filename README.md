@@ -78,11 +78,11 @@ Passos de infra — estado em 15/09/2026:
       via headless Chrome + a mesma conversão luminância→alpha da logo,
       porque e-mail não carrega `@font-face` de forma confiável entre
       clientes), `icon-whatsapp.png`, `icon-instagram.png`, e
-      `shadow-banner.jpg` (recorte só do rosto do "Kaneki" da estampa de
-      `public/kaneki.jpg`, foto de produto de uma camiseta — proporção
-      retrato 460×529, diferente do 600×202 bem largo do template
-      original, porque um recorte só-do-rosto não cabe numa faixa curta
-      sem cortar queixo/testa).
+      `shadow-banner.jpg` (recorte do rosto do "Kaneki" da estampa de uma
+      camiseta, enquadramento fornecido pelo usuário —
+      `public/kaneki_v2.jpg`, 990×224, larga e curta, próxima do 600×202
+      do template original — só reduzida pra 600px de largura, nunca
+      ampliada, pra não borrar).
       `shadow-tribal-tl.png`, `shadow-tribal-br.png` e `icon-discord.png`
       não existem e foram **removidos do template** (em vez de apontar
       pra imagem quebrada) — os `<tr>`/`<td>` que os usavam estão

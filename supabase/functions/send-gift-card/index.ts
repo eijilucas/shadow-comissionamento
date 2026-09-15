@@ -122,13 +122,12 @@ function giftCardEmailHtml(params: { memberName: string; code: string; amount: n
           </tr>
 
           <tr>
-            <td align="center" style="padding: 8px 0 0;">
-              <!-- Recorte do rosto do Kaneki (foto de produto da camiseta
-                   em public/kaneki.jpg) -- proporção retrato (460x529),
-                   diferente do 600x202 bem largo do template original do
-                   Mental Madness, porque um recorte só-do-rosto não cabe
-                   numa faixa curta sem cortar o queixo ou a testa. -->
-              <img src="${EMAIL_ASSETS_BASE}/shadow-banner.jpg" width="460" height="529" alt="" style="display:block; width:100%; max-width:460px; height:auto; border:0; outline:none; margin: 0 auto;">
+            <td style="padding: 8px 0 0;">
+              <!-- Recorte do rosto do Kaneki, enquadramento definido pelo
+                   usuário (public/kaneki_v2.jpg, 990x224) -- larga e curta,
+                   igual à proporção do template original (600x202). Só
+                   reduzida pra largura do container, nunca ampliada. -->
+              <img src="${EMAIL_ASSETS_BASE}/shadow-banner.jpg" width="600" height="136" alt="" style="display:block; width:100%; max-width:600px; height:auto; border:0; outline:none;">
             </td>
           </tr>
 
