@@ -40,9 +40,10 @@ Passos de infra — estado em 15/09/2026:
 - [x] ~~Configurar os secrets do Shopify~~ — feito, os 5:
       `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`,
       `SHOPIFY_GIFTCARD_CLIENT_ID`, `SHOPIFY_GIFTCARD_CLIENT_SECRET`.
-      Ainda faltam `RESEND_API_KEY` e `ASAAS_API_KEY` — sem eles,
-      `send-gift-card` e `pay-commission-pix` estão deployadas mas falham em
-      runtime.
+- [x] ~~Configurar `RESEND_API_KEY`~~ — feito. `send-gift-card` já consegue
+      mandar o e-mail do gift card.
+- [ ] Configurar `ASAAS_API_KEY` — pendente, decisão de deixar pra depois.
+      Sem ele, `pay-commission-pix` está deployada mas falha em runtime.
 - [x] ~~Deploy das Edge Functions~~ — feito, as 10 estão `ACTIVE`.
       `shopify-webhook` confirmado com `verify_jwt: false` (as outras 9 com
       `true`, correto). Testado com um POST sem HMAC: respondeu
