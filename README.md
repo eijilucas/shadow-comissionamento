@@ -147,6 +147,22 @@ Pra dar acesso de **admin**: crie a conta em Authentication → Users no
 painel do Supabase, copie o `auth_user_id`, e rode o `insert` comentado no
 final da migration `20260912000001_init.sql` (`is_admin = true`).
 
+### Domínio sintético de login
+
+Membro loga com usuário (cupom) + senha; por baixo, isso vira um e-mail
+sintético `<cupom>@shadow.com` (`SYNTHETIC_LOGIN_DOMAIN`, precisa ficar
+igual em `src/lib/auth.ts` e `supabase/functions/shopify-webhook/index.ts`
+— os dois lugares que constroem esse e-mail do zero; `create-member-login`,
+`bulk-create-logins` e os scripts leem `members.email` já pronto, não
+precisam do valor). Ninguém recebe e-mail nesse domínio de verdade.
+
+Era `sotf.internal` até 16/09/2026 — trocado a pedido do usuário. Migração
+feita pra 106 membros (todos exceto o admin, que usa e-mail real): atualiza
+`members.email` + `auth.users.email` + `auth.identities.identity_data`
+(esse último tem uma coluna `email` GERADA a partir do `identity_data`, não
+dá pra fazer `update` direto nela -- só ajustando o JSON). Verificado com
+login real antes e depois da troca de domínio.
+
 ## Rodar localmente
 
 ```

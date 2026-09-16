@@ -4,7 +4,7 @@
 // supabase/migrations/20260912000001_init.sql e
 // scripts/create-member-logins.mjs) -- precisa ficar igual ao
 // SYNTHETIC_LOGIN_DOMAIN em supabase/functions/shopify-webhook/index.ts.
-export const SYNTHETIC_LOGIN_DOMAIN = "sotf.internal";
+export const SYNTHETIC_LOGIN_DOMAIN = "shadow.com";
 
 export function resolveLoginEmail(input: string): string {
   const trimmed = input.trim();

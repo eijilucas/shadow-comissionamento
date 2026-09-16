@@ -57,7 +57,7 @@ const SHOPIFY_CLIENT_SECRET = Deno.env.get("SHOPIFY_CLIENT_SECRET") ?? "";
 
 // Precisa ficar igual a SYNTHETIC_LOGIN_DOMAIN em src/lib/auth.ts — é o
 // domínio fake usado pra logar sem precisar de e-mail de verdade.
-const SYNTHETIC_LOGIN_DOMAIN = "sotf.internal";
+const SYNTHETIC_LOGIN_DOMAIN = "shadow.com";
 
 // service role: esta função precisa escrever em `sales`/`members` e criar
 // login no Auth, nada disso tem policy de escrita para usuários comuns (por
