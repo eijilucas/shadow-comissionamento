@@ -24,9 +24,13 @@ mm-etiquetas nem Vendas Externas.
 Passos de infra — estado em 15/09/2026:
 
 - [x] ~~Criar o app customizado principal na loja Shopify~~ — feito.
-      Loja `zu1bmt-6k.myshopify.com`, escopos `read_discounts`,
-      `write_discounts`, `read_products`. Client ID/Secret já configurados
-      como secrets da function (ver abaixo).
+      Loja `zu1bmt-6k.myshopify.com`, escopos concedidos hoje (confirmado
+      via token OAuth): `write_discounts,read_products` (implica
+      `read_discounts`). **Falta `read_orders`** — sem ele a Shopify
+      recusa criar/gerenciar os webhooks `orders/paid`,
+      `orders/cancelled`, `refunds/create` via API (ver checklist de
+      webhooks abaixo). Client ID/Secret já configurados como secrets da
+      function (ver abaixo).
 - [x] ~~Criar o SEGUNDO app, o de gift card~~ — feito, escopo
       `write_gift_cards`. `SHOPIFY_GIFTCARD_CLIENT_ID`/`_SECRET`
       configurados como secrets das functions.
@@ -50,14 +54,30 @@ Passos de infra — estado em 15/09/2026:
       `401 Assinatura HMAC inválida` — confirma que a function está no ar
       *e* que `SHOPIFY_CLIENT_SECRET` está configurado (sem o secret, a
       function loga um warn e deixa passar, "modo dev").
-- [ ] Registrar os webhooks na Shopify — **na verdade não estão
-      registrados**. Um teste de ponta a ponta em 15/09/2026 (criar cupom
-      na Shopify e esperar o webhook `discounts/create` cadastrar o
-      membro sozinho) não disparou nada; conferido via API
-      (`webhookSubscriptions` e `/webhooks.json`, os dois vazios) — zero
-      webhooks na loja. URL de destino:
+- [x] ~~`discounts/create`, `collections/create`, `discounts/delete`~~ —
+      registrados via API em 15/09/2026, confirmados ativos
+      (`webhookSubscriptionCreate` sem erro, IDs retornados). Um teste de
+      ponta a ponta antes disso (criar cupom na Shopify e esperar o
+      webhook cadastrar o membro sozinho) não tinha disparado nada, e a
+      consulta via API mostrava zero webhooks — por isso a certeza de que
+      precisavam ser recriados.
+- [ ] `orders/paid`, `orders/cancelled`, `refunds/create` — **a Shopify
+      recusou criar via API**: "You cannot create a webhook subscription
+      with the specified topic". Causa confirmada: o app só tem os
+      escopos `write_discounts,read_products` — falta `read_orders` (ou
+      equivalente) pra gerenciar webhook de pedido. Sem esses 3, nenhuma
+      venda de verdade da Shopify vai cair em `sales` — são os mais
+      importantes dos 6.
+      Podem já existir criados pela UI do admin (Settings → Notifications
+      → Webhooks), que não passa pela mesma restrição de escopo do app —
+      nesse caso ficam invisíveis pras consultas via API do app. **Não dá
+      pra confirmar isso por aqui — precisa olhar direto no painel da
+      Shopify.** Se existirem lá, tudo certo; se não, adicionar
+      `read_orders` ao app (Configurações → Apps → o app → permissões,
+      provavelmente exige reautorizar) antes de registrar via API.
+      URL de destino, pros 6:
       `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`,
-      lista de eventos na seção "Webhook da Shopify" abaixo.
+      lista completa de eventos na seção "Webhook da Shopify" abaixo.
 - [x] ~~Deploy do frontend~~ — feito, no ar em
       `https://shadow-comissao.vercel.app` (projeto Vercel
       `eiji-mental/shadow-comissao`, ligado ao repo do GitHub — todo push em
