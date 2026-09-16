@@ -50,13 +50,14 @@ Passos de infra — estado em 15/09/2026:
       `401 Assinatura HMAC inválida` — confirma que a function está no ar
       *e* que `SHOPIFY_CLIENT_SECRET` está configurado (sem o secret, a
       function loga um warn e deixa passar, "modo dev").
-- [x] ~~Registrar os webhooks na Shopify~~ — feito, os 6, apontando pra
-      `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`.
-      Sem confirmação automática ainda (criar a assinatura não dispara
-      nada sozinho, só evento real ou "Send test notification" manual) —
-      pra verificar de verdade: fazer um pedido de teste com cupom de
-      afiliado na loja e olhar se a venda aparece em `sales`, ou checar o
-      Log Explorer do projeto no painel do Supabase.
+- [ ] Registrar os webhooks na Shopify — **na verdade não estão
+      registrados**. Um teste de ponta a ponta em 15/09/2026 (criar cupom
+      na Shopify e esperar o webhook `discounts/create` cadastrar o
+      membro sozinho) não disparou nada; conferido via API
+      (`webhookSubscriptions` e `/webhooks.json`, os dois vazios) — zero
+      webhooks na loja. URL de destino:
+      `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`,
+      lista de eventos na seção "Webhook da Shopify" abaixo.
 - [x] ~~Deploy do frontend~~ — feito, no ar em
       `https://shadow-comissao.vercel.app` (projeto Vercel
       `eiji-mental/shadow-comissao`, ligado ao repo do GitHub — todo push em
@@ -223,6 +224,38 @@ Regras atuais:
   +R$150, 10 → +R$250, 15 → +R$400 (trava aqui: 15+ = R$1.050 no total).
 - **Comissão fixa de 5%** a partir de 6 vendas/mês, sobre o valor vendido
   no mês inteiro (`app_config.commission_base`: bruto por padrão).
+
+## Teste de ponta a ponta (15/09/2026) — achados
+
+Criei um cupom de teste na Shopify, esperei o webhook `discounts/create`
+cadastrar o membro sozinho, lancei vendas manuais e conferi se o ciclo
+recalculava certo. Dois achados:
+
+- **Nenhum webhook estava de fato registrado na Shopify** — confirmado via
+  API (GraphQL `webhookSubscriptions` e REST `/webhooks.json`, os dois
+  vazios). O cadastro anterior não colou ou nunca foi salvo. Ainda
+  pendente: registrar os 6 (ver seção "Webhook da Shopify" acima pra lista
+  de eventos).
+- **Bug real: apagar um membro com vendas quebrava.** `delete from members`
+  dispara o cascade de `sales` (`on delete cascade`); cada venda apagada
+  dispara `sales_after_change`, que chama `recalc_member_cycle` -- e essa
+  função tentava fazer um `insert ... on conflict do update` em `cycles`
+  referenciando um `member_id` que, naquele ponto da mesma transação, já
+  tinha sido removido de `members`. A foreign key `cycles_member_id_fkey`
+  rejeitava a escrita e a transação inteira falhava -- ou seja, o botão
+  "Excluir" do painel (e o evento `discounts/delete` da Shopify) não
+  funcionava pra **nenhum membro com histórico de vendas**, o caso mais
+  comum na prática. Corrigido em
+  `supabase/migrations/20260915000001_fix_recalc_cycle_on_member_delete.sql`:
+  `recalc_member_cycle` agora sai sem fazer nada se o membro já não existe
+  mais (o cascade de `cycles`, que também tem `on delete cascade`, cuida da
+  limpeza sozinho). Reproduzido o cenário exato (membro com 3 vendas,
+  ciclo calculado, `delete from members` direto) antes e depois da correção
+  pra confirmar.
+
+O motor de cálculo (`calculate_cycle_rewards`) bateu certo no teste: 3
+vendas somando R$450 → `gift_card_value = 100.00`, `commission_amount =
+0.00` (correto, comissão só entra a partir de 6 vendas).
 
 ## Deploy das functions
 
