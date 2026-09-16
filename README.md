@@ -26,10 +26,10 @@ Passos de infra — estado em 15/09/2026:
 - [x] ~~Criar o app customizado principal na loja Shopify~~ — feito.
       Loja `zu1bmt-6k.myshopify.com`, escopos concedidos hoje (confirmado
       via token OAuth): `write_discounts,read_products` (implica
-      `read_discounts`). **Falta `read_orders`** — sem ele a Shopify
-      recusa criar/gerenciar os webhooks `orders/paid`,
-      `orders/cancelled`, `refunds/create` via API (ver checklist de
-      webhooks abaixo). Client ID/Secret já configurados como secrets da
+      `read_discounts`). Não tem `read_orders` — não é bloqueio (os
+      webhooks de pedido funcionam via UI do admin, ver checklist de
+      webhooks abaixo), só limita gerenciar esses 3 webhooks pela API do
+      app no futuro. Client ID/Secret já configurados como secrets da
       function (ver abaixo).
 - [x] ~~Criar o SEGUNDO app, o de gift card~~ — feito, escopo
       `write_gift_cards`. `SHOPIFY_GIFTCARD_CLIENT_ID`/`_SECRET`
@@ -61,20 +61,16 @@ Passos de infra — estado em 15/09/2026:
       webhook cadastrar o membro sozinho) não tinha disparado nada, e a
       consulta via API mostrava zero webhooks — por isso a certeza de que
       precisavam ser recriados.
-- [ ] `orders/paid`, `orders/cancelled`, `refunds/create` — **a Shopify
-      recusou criar via API**: "You cannot create a webhook subscription
-      with the specified topic". Causa confirmada: o app só tem os
-      escopos `write_discounts,read_products` — falta `read_orders` (ou
-      equivalente) pra gerenciar webhook de pedido. Sem esses 3, nenhuma
-      venda de verdade da Shopify vai cair em `sales` — são os mais
-      importantes dos 6.
-      Podem já existir criados pela UI do admin (Settings → Notifications
-      → Webhooks), que não passa pela mesma restrição de escopo do app —
-      nesse caso ficam invisíveis pras consultas via API do app. **Não dá
-      pra confirmar isso por aqui — precisa olhar direto no painel da
-      Shopify.** Se existirem lá, tudo certo; se não, adicionar
-      `read_orders` ao app (Configurações → Apps → o app → permissões,
-      provavelmente exige reautorizar) antes de registrar via API.
+- [x] ~~`orders/paid`, `orders/cancelled`, `refunds/create`~~ — confirmado
+      pelo usuário direto no painel (Settings → Notifications → Webhooks):
+      os 3 estão listados lá. Registrados pela UI do admin, não pela API
+      do app — por isso a tentativa de criar via API acusou "You cannot
+      create a webhook subscription with the specified topic" (o app só
+      tem os escopos `write_discounts,read_products`, sem `read_orders`)
+      e a consulta via API não os enxergava: UI e API-do-app usam
+      permissões diferentes, e um não vê o que o outro criou. Só é preciso
+      mexer em escopo (`read_orders`) se um dia quiser gerenciar esses 3
+      pela API em vez da UI — não é bloqueio pro funcionamento deles.
       URL de destino, pros 6:
       `https://rveyiabuqhcfiezklhms.supabase.co/functions/v1/shopify-webhook`,
       lista completa de eventos na seção "Webhook da Shopify" abaixo.
@@ -251,11 +247,16 @@ Criei um cupom de teste na Shopify, esperei o webhook `discounts/create`
 cadastrar o membro sozinho, lancei vendas manuais e conferi se o ciclo
 recalculava certo. Dois achados:
 
-- **Nenhum webhook estava de fato registrado na Shopify** — confirmado via
-  API (GraphQL `webhookSubscriptions` e REST `/webhooks.json`, os dois
-  vazios). O cadastro anterior não colou ou nunca foi salvo. Ainda
-  pendente: registrar os 6 (ver seção "Webhook da Shopify" acima pra lista
-  de eventos).
+- **A consulta via API mostrava zero webhooks, mas isso não queria dizer
+  zero webhooks de verdade.** `discounts/create` (o que esse teste
+  esperava) realmente não existia — recriei via API e confirmei que
+  passou a funcionar. Mas `orders/paid`, `orders/cancelled` e
+  `refunds/create` sempre estiveram lá, só que criados pela UI do admin da
+  Shopify (Settings → Notifications), não pela API do app — a API do app
+  só enxerga/gerencia o que ELA criou, não o que a UI cria com a sessão do
+  usuário. `collections/create` e `discounts/delete` também não existiam;
+  os 6 estão registrados agora (3 via API nesta sessão, 3 já existiam via
+  UI, confirmado direto no painel pelo usuário).
 - **Bug real: apagar um membro com vendas quebrava.** `delete from members`
   dispara o cascade de `sales` (`on delete cascade`); cada venda apagada
   dispara `sales_after_change`, que chama `recalc_member_cycle` -- e essa
